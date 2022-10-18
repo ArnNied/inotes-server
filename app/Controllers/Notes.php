@@ -21,17 +21,6 @@ class Notes extends BaseController
         // E.g.: $this->session = \Config\Services::session();
     }
 
-    protected function generate_id($length = 32)
-    {
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $charactersLength = strlen($characters);
-        $randomString = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[rand(0, $charactersLength - 1)];
-        }
-        return $randomString;
-    }
-
     public function get_all()
     {
         // Get all notes

@@ -8,7 +8,7 @@ class Session extends Model
 {
     protected $DBGroup          = 'default';
     protected $table            = 'sessions';
-    protected $primaryKey       = '';
+    protected $primaryKey       = 'hash';
     protected $useAutoIncrement = false;
     protected $insertID         = 0;
     protected $returnType       = 'array';
@@ -39,4 +39,21 @@ class Session extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function check_and_refresh_hash($hash)
+    {
+        $session = $this->where('hash', $hash)->first();
+
+        if ($session) {
+            $this->update($hash, ['expiry' => time() + 604800]);
+            return $session['hash'];
+        } else {
+            return false;
+        }
+    }
+
+    public function expunge_expired_sessions()
+    {
+        $this->where('expiry <', time())->delete();
+    }
 }
