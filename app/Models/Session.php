@@ -40,16 +40,9 @@ class Session extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function check_and_refresh_hash($hash)
+    public function refresh_session($hash, $seconds = 604800)
     {
-        $session = $this->where('hash', $hash)->first();
-
-        if ($session) {
-            $this->update($hash, ['expiry' => time() + 604800]);
-            return $session['hash'];
-        } else {
-            return false;
-        }
+        $this->update($hash, ['expiry' => time() + $seconds]);
     }
 
     public function expunge_expired_sessions()

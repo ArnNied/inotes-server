@@ -25,7 +25,7 @@ class Notes extends BaseController
     {
         // Get all notes
         // Method: GET
-        // Payload: "user"
+        // Payload: "session"
         // Return: "notes[]"
         return $this->respond(["message" => "Hello World!"]);
     }

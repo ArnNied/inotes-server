@@ -91,6 +91,9 @@ class Auth extends BaseController
         if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
             return $this->respond(["message" => "Invalid email"], 400);
         }
+        if (strlen($email) > 255) {
+            return $this->respond(["message" => "Email must be less than 255 characters"], 400);
+        }
         if ($password != $confirm_password) {
             return $this->respond(["message" => "Password and Confirm Password doesn't match"], 400);
         }
@@ -115,7 +118,7 @@ class Auth extends BaseController
     {
         // Change password
         // Method: POST
-        // Payload: "user", "old_password", "new_password", "confirm_password"
+        // Payload: "session", "old_password", "new_password", "confirm_password"
 
         $email = $this->request->getVar('email');
 
@@ -138,9 +141,9 @@ class Auth extends BaseController
     {
         // Delete user session
         // Method: POST
-        // Payload: "user"
+        // Payload: "session"
 
-        $session = $this->request->getVar('user');
+        $session = $this->request->getVar('session');
 
         if (empty($session)) {
             return $this->respond(["message" => "`session` is required"], 400);
