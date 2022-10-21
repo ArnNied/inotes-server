@@ -18,6 +18,9 @@ class Auth extends BaseController
         $this->userModel = new \App\Models\User();
         $this->sessionModel = new \App\Models\Session();
 
+        $this->sessionModel->expunge_expired_sessions();
+
+
         // E.g.: $this->session = \Config\Services::session();
     }
 
@@ -27,8 +30,6 @@ class Auth extends BaseController
         // Method: POST
         // Payload: "email", "password"
         // Return: "session", "email", "first_name", "last_name"
-
-        $this->sessionModel->expunge_expired_sessions();
 
         $email = $this->request->getVar('email');
         $password = $this->request->getVar('password');
