@@ -30,13 +30,13 @@ class Users extends BaseController
         // Payload: "session"
         // Return: "email", "first_name", "last_name"
 
-        $session = $this->request->getVar('session');
+        $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
         $email = $this->request->getVar('email');
         $first_name = $this->request->getVar('first_name');
         $last_name = $this->request->getVar('last_name');
 
         if (empty($session)) {
-            return $this->respond(["message" => "`session` is required"], 400);
+            return $this->respond(["message" => "Bearer token is required"], 400);
         } else {
             $this->sessionModel->refresh_session($session);
         }
@@ -79,13 +79,13 @@ class Users extends BaseController
         // Method: POST
         // Payload: "session", "old_password", "new_password", "confirm_password"
 
-        $session = $this->request->getVar('session');
+        $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
         $old_password = $this->request->getVar('old_password');
         $new_password = $this->request->getVar('new_password');
         $confirm_password = $this->request->getVar('confirm_password');
 
         if (empty($session)) {
-            return $this->respond(["message" => "`session` is required"], 400);
+            return $this->respond(["message" => "Bearer token is required"], 400);
         } else {
             $this->sessionModel->refresh_session($session);
         }
@@ -122,10 +122,10 @@ class Users extends BaseController
         // Method: DELETE
         // Payload: "session"
 
-        $session = $this->request->getVar('session');
+        $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
 
         if (empty($session)) {
-            return $this->respond(["message" => "`session` is required"], 400);
+            return $this->respond(["message" => "Bearer token is required"], 400);
         } else {
             $this->sessionModel->refresh_session($session);
         }

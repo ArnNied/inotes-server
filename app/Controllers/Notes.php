@@ -32,10 +32,10 @@ class Notes extends BaseController
         // Payload: "session"
         // Return: "notes[]"
 
-        $session = $this->request->getVar('session');
+        $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
 
         if (empty($session)) {
-            return $this->respond(["message" => "`session` is required"], 400);
+            return $this->respond(["message" => "Bearer token is required"], 400);
         }
         if (!$this->sessionModel->where('hash', $session)->first()) {
             return $this->respond(["message" => "Invalid session"], 400);
@@ -56,12 +56,12 @@ class Notes extends BaseController
         // Payload: "session", "title", "body"
         // Return: "note_id", "title", "body", "created_at", "last_updated"
 
-        $session = $this->request->getVar('session');
+        $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
         $title = $this->request->getVar('title');
         $body = $this->request->getVar('body');
 
         if (empty($session)) {
-            return $this->respond(["message" => "`session` is required"], 400);
+            return $this->respond(["message" => "Bearer token is required"], 400);
         }
         if (!$this->sessionModel->where('hash', $session)->first()) {
             return $this->respond(["message" => "Invalid session"], 400);
@@ -101,10 +101,10 @@ class Notes extends BaseController
         // Payload: "session"
         // Return: "id", "title", "body", "created_at", "last_updated"
 
-        $session = $this->request->getVar('session');
+        $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
 
         if (empty($session)) {
-            return $this->respond(["message" => "`session` is required"], 400);
+            return $this->respond(["message" => "Bearer token is required"], 400);
         }
         if (!$this->sessionModel->where('hash', $session)->first()) {
             return $this->respond(["message" => "Invalid session"], 400);
@@ -128,12 +128,12 @@ class Notes extends BaseController
         // Payload: "session", "title", "body"
         // Return: "id", "title", "body", "created_at", "last_updated"
 
-        $session = $this->request->getVar('session');
+        $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
         $title = $this->request->getVar('title');
         $body = $this->request->getVar('body');
 
         if (empty($session)) {
-            return $this->respond(["message" => "`session` is required"], 400);
+            return $this->respond(["message" => "Bearer token is required"], 400);
         }
         if (!$this->sessionModel->where('hash', $session)->first()) {
             return $this->respond(["message" => "Invalid session"], 400);
@@ -167,10 +167,10 @@ class Notes extends BaseController
         // Method: DELETE
         // Payload: "session"
 
-        $session = $this->request->getVar('session');
+        $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
 
         if (empty($session)) {
-            return $this->respond(["message" => "`session` is required"], 400);
+            return $this->respond(["message" => "Bearer token is required"], 400);
         }
         if (!$this->sessionModel->where('hash', $session)->first()) {
             return $this->respond(["message" => "Invalid session"], 400);

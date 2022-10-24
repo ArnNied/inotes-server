@@ -144,10 +144,10 @@ class Auth extends BaseController
         // Method: POST
         // Payload: "session"
 
-        $session = $this->request->getVar('session');
+        $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
 
         if (empty($session)) {
-            return $this->respond(["message" => "`session` is required"], 400);
+            return $this->respond(["message" => "Bearer token is required"], 400);
         }
 
         // Check if session exists

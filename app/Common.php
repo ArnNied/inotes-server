@@ -24,3 +24,8 @@ function generate_string($length = 32)
   }
   return $randomString;
 }
+
+function get_bearer_token($authorization)
+{
+  return str_replace('Bearer ', '', $authorization);
+}
