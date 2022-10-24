@@ -7,6 +7,9 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 class Auth extends BaseController
 {
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
@@ -130,12 +133,38 @@ class Auth extends BaseController
         $user = $this->userModel->where('email', $email)->first();
 
         if ($user) {
+            $randomPassword = generate_string(16);
+            $mail = new PHPMailer(true);
+
+            try {
+                // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
+                $mail->isSMTP();                                            //Send using SMTP
+                $mail->Host       = getenv('PHPMAILER_HOST');                     //Set the SMTP server to send through
+                $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
+                $mail->Username   = getenv('PHPMAILER_EMAIL');                     //SMTP username
+                $mail->Password   = getenv('PHPMAILER_PASSWORD');                               //SMTP password
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
+                $mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+
+                //Recipients
+                $mail->setFrom(getenv('PHPMAILER_EMAIL'), 'iNotes');
+                $mail->addAddress($email);     //Add a recipient
+
+                //Content
+                $mail->isHTML();
+                $mail->Subject = 'iNotes Password Reset Request';
+                $mail->Body    = 'Your iNotes account password has been reset to <b>' . $randomPassword . '</b>. Please change your password after login.';
+                $mail->AltBody = 'Your iNotes account password has been reset to "' . $randomPassword . '". Please change your password after login.';
+
+                $mail->send();
+            } catch (Exception $e) {
+            }
             $this->userModel->update($user['id'], [
-                'password' => password_hash("123", PASSWORD_DEFAULT),
+                'password' => password_hash($randomPassword, PASSWORD_DEFAULT),
             ]);
         }
 
-        return $this->respond(["message" => "Password has been reset to '123'."], 200);
+        return $this->respond(["message" => "Password reset successful"], 200);
     }
 
     public function logout()
