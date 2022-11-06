@@ -27,6 +27,38 @@ class Auth extends BaseController
         // E.g.: $this->session = \Config\Services::session();
     }
 
+    private function _sendEmail(String $recipient, String $subject, String $body, String $altBody)
+    {
+        $mail = new PHPMailer(true);
+
+        try {
+            // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
+            $mail->isSMTP();                                            //Send using SMTP
+            $mail->Host       = getenv('PHPMAILER_HOST');                     //Set the SMTP server to send through
+            $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
+            $mail->Username   = getenv('PHPMAILER_EMAIL');                     //SMTP username
+            $mail->Password   = getenv('PHPMAILER_PASSWORD');                               //SMTP password
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
+            $mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+
+            //Recipients
+            $mail->setFrom(getenv('PHPMAILER_EMAIL'), 'iNotes');
+            $mail->addAddress($recipient);     //Add a recipient
+
+            //Content
+            $mail->isHTML();
+            $mail->Subject = $subject;
+            $mail->Body = $body;
+            $mail->AltBody = $altBody || $body;
+
+            $mail->send();
+
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
     public function login()
     {
         // Membuat session baru untuk user yang login
@@ -48,11 +80,11 @@ class Auth extends BaseController
             $verifyPassword = password_verify($password, $user['password']);
             if ($verifyPassword) {
 
-                $sessionHash = generate_string(32);
+                $sessionHash = "session-" . generate_string(32);
 
                 // // If a duplicate session is found, regenerate session hash
                 while ($sessionHash == $this->sessionModel->where('hash', $sessionHash)->first()) {
-                    $sessionHash = generate_string(32);
+                    $sessionHash = "session-" . generate_string(32);
                 }
 
                 // Create new session
@@ -75,7 +107,7 @@ class Auth extends BaseController
                 return $this->respond(['message' => 'Incorrect Password'], 400);
             }
         } else {
-            return $this->respond(['message' => 'User not found'], 404);
+            return $this->respond(['message' => "No user with the email '$email' has been registered"], 404);
         }
     }
 
@@ -83,13 +115,12 @@ class Auth extends BaseController
     {
         // Membuat user baru
         // Method: POST
-        // Payload: "email", "password", "confirm_password"
+        // Payload: "email", "password"
 
         $email = $this->request->getVar('email');
         $password = $this->request->getVar('password');
-        $confirm_password = $this->request->getVar('confirm_password');
 
-        if (empty($email) || empty($password) || empty($confirm_password)) {
+        if (empty($email) || empty($password)) {
             return $this->respond(["message" => "`email`, `password`, and `confirm_password` is required"], 400);
         }
         if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
@@ -97,9 +128,6 @@ class Auth extends BaseController
         }
         if (strlen($email) > 255) {
             return $this->respond(["message" => "Email must be less than 255 characters"], 400);
-        }
-        if ($password != $confirm_password) {
-            return $this->respond(["message" => "Password and Confirm Password doesn't match"], 400);
         }
         if (strlen($password) < 8) {
             return $this->respond(["message" => "Password must be at least 8 characters"], 400);
@@ -124,6 +152,9 @@ class Auth extends BaseController
         // Method: POST
         // Payload: "session", "old_password", "new_password", "confirm_password"
 
+        $resetPasswordModel = new \App\Models\ResetPasswordToken();
+        $resetPasswordModel->expunge_expired_tokens();
+
         $email = $this->request->getVar('email');
 
         if (empty($email)) {
@@ -133,38 +164,65 @@ class Auth extends BaseController
         $user = $this->userModel->where('email', $email)->first();
 
         if ($user) {
-            $randomPassword = generate_string(16);
-            $mail = new PHPMailer(true);
+            $token = generate_string(6, "0123456789");
 
-            try {
-                // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
-                $mail->isSMTP();                                            //Send using SMTP
-                $mail->Host       = getenv('PHPMAILER_HOST');                     //Set the SMTP server to send through
-                $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-                $mail->Username   = getenv('PHPMAILER_EMAIL');                     //SMTP username
-                $mail->Password   = getenv('PHPMAILER_PASSWORD');                               //SMTP password
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
-                $mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+            $emailSent = $this->_sendEmail(
+                $email,
+                'iNotes Password Reset Request',
+                "Your request to reset your password has been received. If you did not request a password reset, please ignore this email. If you did request a password reset, please use the following token to reset your password:<br><br><b>$token</b></br></br>This token will expire in 5 minutes.",
+                "Your request to reset your password has been received. If you did not request a password reset, please ignore this email. If you did request a password reset, please use the following token to reset your password:\n\n$token\n\nThis token will expire in 5 minutes.",
+            );
 
-                //Recipients
-                $mail->setFrom(getenv('PHPMAILER_EMAIL'), 'iNotes');
-                $mail->addAddress($email);     //Add a recipient
-
-                //Content
-                $mail->isHTML();
-                $mail->Subject = 'iNotes Password Reset Request';
-                $mail->Body    = 'Your iNotes account password has been reset to <b>' . $randomPassword . '</b>. Please change your password after login.';
-                $mail->AltBody = 'Your iNotes account password has been reset to "' . $randomPassword . '". Please change your password after login.';
-
-                $mail->send();
-            } catch (Exception $e) {
+            if ($emailSent) {
+                $resetPasswordModel->insert([
+                    'user_id' => $user['id'],
+                    'token' => $token,
+                    'expiry' => time() + 300, // 5 minutes
+                ]);
+            } else {
+                return $this->respond(["message" => "Failed to send email"], 500);
             }
-            $this->userModel->update($user['id'], [
-                'password' => password_hash($randomPassword, PASSWORD_DEFAULT),
-            ]);
         }
 
-        return $this->respond(["message" => "Password reset successful"], 200);
+        return $this->respond(["message" => "Email sent"], 200);
+    }
+
+    public function confirm_reset_password()
+    {
+        // Confirm change password
+        // Method: POST
+        // Payload: "token", "new_password"
+
+
+        $resetPasswordModel = new \App\Models\ResetPasswordToken();
+        $resetPasswordModel->expunge_expired_tokens();
+
+        $token = $this->request->getVar('token');
+        $newPassword = $this->request->getVar('newPassword');
+
+        if (empty($token)) {
+            return $this->respond(["message" => "`token` is required"], 400);
+        }
+        if (empty($newPassword)) {
+            return $this->respond(["message" => "`newPassword` is required"], 400);
+        }
+        if (strlen($newPassword) < 8) {
+            return $this->respond(["message" => "New password must be at least 8 characters"], 400);
+        }
+
+        $token = $resetPasswordModel->where('token', $token)->first();
+
+        if ($token) {
+            $this->userModel->update($token['user_id'], [
+                'password' => password_hash($newPassword, PASSWORD_DEFAULT),
+            ]);
+
+            $resetPasswordModel->delete($token);
+
+            return $this->respond(["message" => "Password reset confirmed"], 200);
+        } else {
+            return $this->respond(["message" => "Invalid token"], 400);
+        }
     }
 
     public function logout()

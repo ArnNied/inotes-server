@@ -25,15 +25,15 @@ class Users extends BaseController
 
     public function update_info()
     {
-        // Update "first_name", "last_name" dan "email"
+        // Update "firstName", "lastName" dan "email"
         // Method: PUT
         // Payload: "session"
-        // Return: "email", "first_name", "last_name"
+        // Return: "email", "firstName", "lastName"
 
         $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
         $email = $this->request->getVar('email');
-        $first_name = $this->request->getVar('first_name');
-        $last_name = $this->request->getVar('last_name');
+        $firstName = $this->request->getVar('firstName');
+        $lastName = $this->request->getVar('lastName');
 
         if (empty($session)) {
             return $this->respond(["message" => "Bearer token is required"], 400);
@@ -43,10 +43,10 @@ class Users extends BaseController
         if (empty($email)) {
             return $this->respond(["message" => "`email` is required"], 400);
         }
-        if (strlen($first_name) > 255) {
+        if (strlen($firstName) > 255) {
             return $this->respond(["message" => "First name must be less than 255 characters"], 400);
         }
-        if (strlen($last_name) > 255) {
+        if (strlen($lastName) > 255) {
             return $this->respond(["message" => "Last name must be less than 255 characters"], 400);
         }
 
@@ -56,16 +56,16 @@ class Users extends BaseController
         if ($user) {
             $this->userModel->update($user['id'], [
                 'email' => $email,
-                'first_name' => $first_name,
-                'last_name' => $last_name,
+                'firstName' => $firstName,
+                'lastName' => $lastName,
             ]);
 
             return $this->respond([
                 "message" => "",
                 "data" => [
                     "email" => $email,
-                    "first_name" => $first_name,
-                    "last_name" => $last_name
+                    "firstName" => $firstName,
+                    "lastName" => $lastName
                 ]
             ], 200);
         } else {
@@ -77,34 +77,30 @@ class Users extends BaseController
     {
         // Change password
         // Method: POST
-        // Payload: "session", "old_password", "new_password", "confirm_password"
+        // Payload: "session", "oldPassword", "newPassword", "confirm_password"
 
         $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
-        $old_password = $this->request->getVar('old_password');
-        $new_password = $this->request->getVar('new_password');
-        $confirm_password = $this->request->getVar('confirm_password');
+        $oldPassword = $this->request->getVar('oldPassword');
+        $newPassword = $this->request->getVar('newPassword');
 
         if (empty($session)) {
             return $this->respond(["message" => "Bearer token is required"], 400);
         } else {
             $this->sessionModel->refresh_session($session);
         }
-        if (empty($session) || empty($old_password) || empty($new_password) || empty($confirm_password)) {
-            return $this->respond(["message" => "`session`, `old_password`, `new_password` and `confirm_password` is required"], 400);
+        if (empty($session) || empty($oldPassword) || empty($newPassword)) {
+            return $this->respond(["message" => "`session`, `oldPassword`, `newPassword` and `confirm_password` is required"], 400);
         }
-        if (strlen($new_password) < 8) {
+        if (strlen($newPassword) < 8) {
             return $this->respond(["message" => "New password must be at least 8 characters"], 400);
-        }
-        if ($new_password != $confirm_password) {
-            return $this->respond(["message" => "New password and confirm password must be the same"], 400);
         }
 
         $user = $this->sessionModel->select("*")->join("users", "users.id = sessions.user_id")->where("hash", $session)->first();
 
         if ($user) {
-            if (password_verify($old_password, $user['password'])) {
+            if (password_verify($oldPassword, $user['password'])) {
                 $this->userModel->update($user['id'], [
-                    'password' => password_hash($new_password, PASSWORD_DEFAULT),
+                    'password' => password_hash($newPassword, PASSWORD_DEFAULT),
                 ]);
 
                 return $this->respond(["message" => "Password changed successfully"], 200);
@@ -136,7 +132,7 @@ class Users extends BaseController
         if ($user) {
             $this->userModel->delete($user['id']);
 
-            return $this->respond(["message" => "User deleted successfully"], 200);
+            return $this->respond(["message" => "User successfully deleted"], 200);
         } else {
             return $this->respond(["message" => "User not found"], 404);
         }

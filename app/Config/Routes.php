@@ -36,25 +36,26 @@ $routes->set404Override();
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 $routes->group("user", static function ($routes) {
-    $routes->put('', 'Users::update_info');
+    $routes->patch('', 'Users::update_info');
     $routes->delete('', 'Users::remove');
-    $routes->post('/change-password', 'Users::change_password');
+    $routes->post('change-password', 'Users::change_password');
 });
 
 $routes->group("auth", static function ($routes) {
     $routes->post('login', 'Auth::login');
     $routes->post('register', 'Auth::register');
     $routes->post('reset-password', 'Auth::reset_password');
+    $routes->post('reset-password/confirm', 'Auth::confirm_reset_password');
     $routes->post('logout', 'Auth::logout');
 });
 
 
 $routes->group("note", static function ($routes) {
-    $routes->get('/', 'Notes::get_all');
-    $routes->post('/', 'Notes::create');
+    $routes->get('', 'Notes::get_all');
+    $routes->post('', 'Notes::create');
     $routes->get('(:alphanum)', 'Notes::get/$1');
-    $routes->put('(:alphanum)/edit', 'Notes::modify/$1');
-    $routes->delete('(:alphanum)/delete', 'Notes::remove/$1');
+    $routes->patch('(:alphanum)', 'Notes::modify/$1');
+    $routes->delete('(:alphanum)', 'Notes::remove/$1');
 });
 
 

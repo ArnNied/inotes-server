@@ -75,9 +75,9 @@ class Notes extends BaseController
 
         $user_id = $this->sessionModel->where('hash', $session)->first()['user_id'];
 
-        $note_id = generate_string(32);
+        $note_id = "note-" . generate_string(32);
         while ($this->noteModel->where('id', $note_id)->first()) {
-            $note_id = generate_string(32);
+            $note_id = "note-" . generate_string(32);
         }
 
         $now = time();
@@ -157,7 +157,7 @@ class Notes extends BaseController
             ];
             $this->noteModel->update($id, $note);
 
-            return $this->respond(["message" => "Note successfully modified", "data" => $note],);
+            return $this->respond(["message" => "Note successfully modified", "data" => $note], 200);
         }
     }
 
