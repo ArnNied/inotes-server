@@ -53,9 +53,9 @@ $routes->group("auth", static function ($routes) {
 $routes->group("note", static function ($routes) {
     $routes->get('', 'Notes::get_all');
     $routes->post('', 'Notes::create');
-    $routes->get('(:alphanum)', 'Notes::get/$1');
-    $routes->patch('(:alphanum)', 'Notes::modify/$1');
-    $routes->delete('(:alphanum)', 'Notes::remove/$1');
+    $routes->get('(:segment)', 'Notes::get/$1');
+    $routes->patch('(:segment)', 'Notes::modify/$1');
+    $routes->delete('(:segment)', 'Notes::remove/$1');
 });
 
 
