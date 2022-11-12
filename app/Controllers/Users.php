@@ -23,17 +23,41 @@ class Users extends BaseController
         // E.g.: $this->session = \Config\Services::session();
     }
 
+    public function get_user()
+    {
+        // Get user info
+        // Method: GET
+        // Payload: "session"
+        // Return: "email", "firtName", "last_name"
+
+        $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
+
+        if (empty($session)) {
+            return $this->respond(["message" => "Bearer token is required"], 400);
+        }
+
+        if (!$this->sessionModel->where('hash', $session)->first()) {
+            return $this->respond(["message" => "Invalid session"], 400);
+        } else {
+            $this->sessionModel->refresh_session($session);
+        }
+
+        $user = $this->userModel->select("users.email, users.first_name, users.last_name")->join('sessions', 'sessions.user_id = users.id')->where('sessions.hash', $session)->first();
+
+        return $this->respond(["message" => "User retrieval successful", "data" => $user],);
+    }
+
     public function update_info()
     {
-        // Update "firstName", "lastName" dan "email"
+        // Update "first_name", "last_name" dan "email"
         // Method: PUT
         // Payload: "session"
-        // Return: "email", "firstName", "lastName"
+        // Return: "email", "first_name", "last_name"
 
         $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
         $email = $this->request->getVar('email');
-        $firstName = $this->request->getVar('firstName');
-        $lastName = $this->request->getVar('lastName');
+        $firstName = $this->request->getVar('first_name');
+        $lastName = $this->request->getVar('last_name');
 
         if (empty($session)) {
             return $this->respond(["message" => "Bearer token is required"], 400);
@@ -56,16 +80,16 @@ class Users extends BaseController
         if ($user) {
             $this->userModel->update($user['id'], [
                 'email' => $email,
-                'firstName' => $firstName,
-                'lastName' => $lastName,
+                'first_name' => $firstName,
+                'last_name' => $lastName,
             ]);
 
             return $this->respond([
                 "message" => "",
                 "data" => [
                     "email" => $email,
-                    "firstName" => $firstName,
-                    "lastName" => $lastName
+                    "first_name" => $firstName,
+                    "last_name" => $lastName
                 ]
             ], 200);
         } else {

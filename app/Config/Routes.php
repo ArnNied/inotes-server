@@ -36,6 +36,7 @@ $routes->set404Override();
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 $routes->group("user", static function ($routes) {
+    $routes->get('', "Users::get_user");
     $routes->patch('', 'Users::update_info');
     $routes->delete('', 'Users::remove');
     $routes->post('change-password', 'Users::change_password');
