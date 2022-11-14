@@ -76,11 +76,11 @@ class Users extends BaseController
 
         $emailExist = $this->userModel->where('email', $email)->first();
 
-        if ($emailExist) {
+        $user = $this->sessionModel->select("*")->join("users", "users.id = sessions.user_id")->where("hash", $session)->first();
+
+        if ($emailExist['id'] != $user['user_id']) {
             return $this->respond(["message" => "Update failed! An account with the same email has already been registered"], 400);
         }
-
-        $user = $this->sessionModel->select("*")->join("users", "users.id = sessions.user_id")->where("hash", $session)->first();
 
         if ($user) {
             $this->userModel->update($user['id'], [
