@@ -74,8 +74,13 @@ class Users extends BaseController
             return $this->respond(["message" => "`last_name` must be less than 255 characters"], 400);
         }
 
+        $emailExist = $this->userModel->where('email', $email)->first();
+
+        if ($emailExist) {
+            return $this->respond(["message" => "Update failed! An account with the same email has already been registered"], 400);
+        }
+
         $user = $this->sessionModel->select("*")->join("users", "users.id = sessions.user_id")->where("hash", $session)->first();
-        $this->sessionModel->refresh_session($session);
 
         if ($user) {
             $this->userModel->update($user['id'], [
@@ -155,7 +160,6 @@ class Users extends BaseController
         }
 
         $user = $this->sessionModel->select("*")->join("users", "users.id = sessions.user_id")->where("hash", $session)->first();
-        $this->sessionModel->refresh_session($session);
 
         if ($user) {
             $this->userModel->delete($user['id']);
