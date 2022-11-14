@@ -235,6 +235,10 @@ class Auth extends BaseController
 
         if (empty($session)) {
             return $this->respond(["message" => "Bearer token is required"], 400);
+        } else if (!$this->sessionModel->where('hash', $session)->first()) {
+            return $this->respond(["message" => "Invalid session"], 400);
+        } else {
+            $this->sessionModel->refresh_session($session);
         }
 
         // Check if session exists

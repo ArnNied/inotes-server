@@ -34,9 +34,7 @@ class Users extends BaseController
 
         if (empty($session)) {
             return $this->respond(["message" => "Bearer token is required"], 400);
-        }
-
-        if (!$this->sessionModel->where('hash', $session)->first()) {
+        } else if (!$this->sessionModel->where('hash', $session)->first()) {
             return $this->respond(["message" => "Invalid session"], 400);
         } else {
             $this->sessionModel->refresh_session($session);
@@ -61,6 +59,8 @@ class Users extends BaseController
 
         if (empty($session)) {
             return $this->respond(["message" => "Bearer token is required"], 400);
+        } else if (!$this->sessionModel->where('hash', $session)->first()) {
+            return $this->respond(["message" => "Invalid session"], 400);
         } else {
             $this->sessionModel->refresh_session($session);
         }
@@ -109,10 +109,12 @@ class Users extends BaseController
 
         if (empty($session)) {
             return $this->respond(["message" => "Bearer token is required"], 400);
+        } else if (!$this->sessionModel->where('hash', $session)->first()) {
+            return $this->respond(["message" => "Invalid session"], 400);
         } else {
             $this->sessionModel->refresh_session($session);
         }
-        if (empty($session) || empty($currentPassword) || empty($newPassword)) {
+        if (empty($currentPassword) || empty($newPassword)) {
             return $this->respond(["message" => "`current_password` and `new_password` is required"], 400);
         }
         if (strlen($newPassword) < 8) {
@@ -146,6 +148,8 @@ class Users extends BaseController
 
         if (empty($session)) {
             return $this->respond(["message" => "Bearer token is required"], 400);
+        } else if (!$this->sessionModel->where('hash', $session)->first()) {
+            return $this->respond(["message" => "Invalid session"], 400);
         } else {
             $this->sessionModel->refresh_session($session);
         }
