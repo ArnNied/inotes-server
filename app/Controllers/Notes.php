@@ -35,9 +35,9 @@ class Notes extends BaseController
         $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
 
         if (empty($session)) {
-            return $this->respond(["message" => "Bearer token is required"], 400);
+            return $this->respond(["message" => "Bearer token is required"], 401);
         } else if (!$this->sessionModel->where('hash', $session)->first()) {
-            return $this->respond(["message" => "Invalid session"], 400);
+            return $this->respond(["message" => "Invalid session"], 401);
         } else {
             $this->sessionModel->refresh_session($session);
         }
@@ -60,9 +60,9 @@ class Notes extends BaseController
         $body = $this->request->getVar('body');
 
         if (empty($session)) {
-            return $this->respond(["message" => "Bearer token is required"], 400);
+            return $this->respond(["message" => "Bearer token is required"], 401);
         } else if (!$this->sessionModel->where('hash', $session)->first()) {
-            return $this->respond(["message" => "Invalid session"], 400);
+            return $this->respond(["message" => "Invalid session"], 401);
         } else {
             $this->sessionModel->refresh_session($session);
         }
@@ -102,9 +102,9 @@ class Notes extends BaseController
         $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
 
         if (empty($session)) {
-            return $this->respond(["message" => "Bearer token is required"], 400);
+            return $this->respond(["message" => "Bearer token is required"], 401);
         } else if (!$this->sessionModel->where('hash', $session)->first()) {
-            return $this->respond(["message" => "Invalid session"], 400);
+            return $this->respond(["message" => "Invalid session"], 401);
         } else {
             $this->sessionModel->refresh_session($session);
         }
@@ -130,9 +130,9 @@ class Notes extends BaseController
         $body = $this->request->getVar('body');
 
         if (empty($session)) {
-            return $this->respond(["message" => "Bearer token is required"], 400);
+            return $this->respond(["message" => "Bearer token is required"], 401);
         } else if (!$this->sessionModel->where('hash', $session)->first()) {
-            return $this->respond(["message" => "Invalid session"], 400);
+            return $this->respond(["message" => "Invalid session"], 401);
         } else {
             $this->sessionModel->refresh_session($session);
         }
@@ -166,9 +166,9 @@ class Notes extends BaseController
         $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
 
         if (empty($session)) {
-            return $this->respond(["message" => "Bearer token is required"], 400);
+            return $this->respond(["message" => "Bearer token is required"], 401);
         } else if (!$this->sessionModel->where('hash', $session)->first()) {
-            return $this->respond(["message" => "Invalid session"], 400);
+            return $this->respond(["message" => "Invalid session"], 401);
         } else {
             $this->sessionModel->refresh_session($session);
         }
