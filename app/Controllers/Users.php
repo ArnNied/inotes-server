@@ -68,10 +68,10 @@ class Users extends BaseController
             return $this->respond(["message" => "`email` is required"], 400);
         }
         if (strlen($firstName) > 255) {
-            return $this->respond(["message" => "First name must be less than 255 characters"], 400);
+            return $this->respond(["message" => "`first_name` must be less than 255 characters"], 400);
         }
         if (strlen($lastName) > 255) {
-            return $this->respond(["message" => "Last name must be less than 255 characters"], 400);
+            return $this->respond(["message" => "`last_name` must be less than 255 characters"], 400);
         }
 
         $user = $this->sessionModel->select("*")->join("users", "users.id = sessions.user_id")->where("hash", $session)->first();
@@ -85,7 +85,7 @@ class Users extends BaseController
             ]);
 
             return $this->respond([
-                "message" => "",
+                "message" => "User info updated successfully",
                 "data" => [
                     "email" => $email,
                     "first_name" => $firstName,
@@ -101,35 +101,35 @@ class Users extends BaseController
     {
         // Change password
         // Method: POST
-        // Payload: "session", "oldPassword", "newPassword", "confirm_password"
+        // Payload: "session", "current_password", "new_password", "confirm_password"
 
         $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
-        $oldPassword = $this->request->getVar('oldPassword');
-        $newPassword = $this->request->getVar('newPassword');
+        $currentPassword = $this->request->getVar('current_password');
+        $newPassword = $this->request->getVar('new_password');
 
         if (empty($session)) {
             return $this->respond(["message" => "Bearer token is required"], 400);
         } else {
             $this->sessionModel->refresh_session($session);
         }
-        if (empty($session) || empty($oldPassword) || empty($newPassword)) {
-            return $this->respond(["message" => "`session`, `oldPassword`, `newPassword` and `confirm_password` is required"], 400);
+        if (empty($session) || empty($currentPassword) || empty($newPassword)) {
+            return $this->respond(["message" => "`current_password` and `new_password` is required"], 400);
         }
         if (strlen($newPassword) < 8) {
-            return $this->respond(["message" => "New password must be at least 8 characters"], 400);
+            return $this->respond(["message" => "`new_password` must be at least 8 characters"], 400);
         }
 
         $user = $this->sessionModel->select("*")->join("users", "users.id = sessions.user_id")->where("hash", $session)->first();
 
         if ($user) {
-            if (password_verify($oldPassword, $user['password'])) {
+            if (password_verify($currentPassword, $user['password'])) {
                 $this->userModel->update($user['id'], [
                     'password' => password_hash($newPassword, PASSWORD_DEFAULT),
                 ]);
 
-                return $this->respond(["message" => "Password changed successfully"], 200);
+                return $this->respond(["message" => "Password successfully changed"], 200);
             } else {
-                return $this->respond(["message" => "Old password is incorrect"], 400);
+                return $this->respond(["message" => "Current password is incorrect"], 400);
             }
         } else {
             return $this->respond(["message" => "User not found"], 404);

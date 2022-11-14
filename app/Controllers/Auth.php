@@ -121,7 +121,7 @@ class Auth extends BaseController
         $password = $this->request->getVar('password');
 
         if (empty($email) || empty($password)) {
-            return $this->respond(["message" => "`email`, `password`, and `confirm_password` is required"], 400);
+            return $this->respond(["message" => "`email` and `password`is required"], 400);
         }
         if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
             return $this->respond(["message" => "Invalid email"], 400);
@@ -198,13 +198,13 @@ class Auth extends BaseController
         $resetPasswordModel->expunge_expired_tokens();
 
         $token = $this->request->getVar('token');
-        $newPassword = $this->request->getVar('newPassword');
+        $newPassword = $this->request->getVar('new_password');
 
         if (empty($token)) {
             return $this->respond(["message" => "`token` is required"], 400);
         }
         if (empty($newPassword)) {
-            return $this->respond(["message" => "`newPassword` is required"], 400);
+            return $this->respond(["message" => "`new_password` is required"], 400);
         }
         if (strlen($newPassword) < 8) {
             return $this->respond(["message" => "New password must be at least 8 characters"], 400);
