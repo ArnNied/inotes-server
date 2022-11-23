@@ -1,5 +1,14 @@
 <?php
 
+// CORS POLICY
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: *");
+header("Access-Control-Allow-Methods: *");
+$method = $_SERVER['REQUEST_METHOD'];
+if ($method == "OPTIONS") {
+    die();
+}
+
 // Check PHP version.
 $minPhpVersion = '7.4'; // If you update this, don't forget to update `spark`.
 if (version_compare(PHP_VERSION, $minPhpVersion, '<')) {
