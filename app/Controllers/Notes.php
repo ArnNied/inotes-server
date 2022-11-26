@@ -29,7 +29,8 @@ class Notes extends BaseController
     {
         // Get all notes
         // Method: GET
-        // Payload: "session"
+        // Headers:
+        //  - Authorization: Bearer <session>
         // Return: "notes[]"
 
         $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
@@ -52,7 +53,9 @@ class Notes extends BaseController
     {
         // Create new note
         // Method: POST
-        // Payload: "session", "title", "body"
+        // Headers:
+        //  - Authorization: Bearer <session>
+        // Body (JSON): "title", "body"
         // Return: "note_id", "title", "body", "created_at", "last_updated"
 
         $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
@@ -96,7 +99,8 @@ class Notes extends BaseController
     {
         // Get note
         // Method: GET
-        // Payload: "session"
+        // Headers:
+        //  - Authorization: Bearer <session>
         // Return: "id", "title", "body", "created_at", "last_updated"
 
         $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
@@ -121,8 +125,10 @@ class Notes extends BaseController
     public function modify(String $id)
     {
         // Get note
-        // Method: PUT
-        // Payload: "session", "title", "body"
+        // Method: PATCH
+        // Headers:
+        //  - Authorization: Bearer <session>
+        // Body (JSON): "title", "body"
         // Return: "id", "title", "body", "created_at", "last_updated"
 
         $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
@@ -161,7 +167,8 @@ class Notes extends BaseController
     {
         // Delete note
         // Method: DELETE
-        // Payload: "session"
+        // Headers:
+        //  - Authorization: Bearer <session>
 
         $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
 

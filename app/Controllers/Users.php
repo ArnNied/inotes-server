@@ -27,7 +27,8 @@ class Users extends BaseController
     {
         // Get user info
         // Method: GET
-        // Payload: "session"
+        // Headers:
+        //  - Authorization: Bearer <session>
         // Return: "email", "firtName", "last_name"
 
         $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
@@ -47,9 +48,10 @@ class Users extends BaseController
 
     public function update_info()
     {
-        // Update "first_name", "last_name" dan "email"
-        // Method: PUT
-        // Payload: "session"
+        // Update "first_name", "last_name" and "email"
+        // Method: PATCH
+        // Headers:
+        //  - Authorization: Bearer <session>
         // Return: "email", "first_name", "last_name"
 
         $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
@@ -106,7 +108,9 @@ class Users extends BaseController
     {
         // Change password
         // Method: POST
-        // Payload: "session", "current_password", "new_password", "confirm_password"
+        // Headers:
+        //  - Authorization: Bearer <session>
+        // Body (JSON): "current_password", "new_password", "confirm_password"
 
         $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
         $currentPassword = $this->request->getVar('current_password');
@@ -147,7 +151,8 @@ class Users extends BaseController
     {
         // Delete user
         // Method: DELETE
-        // Payload: "session"
+        // Headers:
+        //  - Authorization: Bearer <session>
 
         $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
 

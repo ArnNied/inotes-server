@@ -61,9 +61,9 @@ class Auth extends BaseController
 
     public function login()
     {
-        // Membuat session baru untuk user yang login
+        // Create a session for the user
         // Method: POST
-        // Payload: "email", "password"
+        // Body (JSON): "email", "password"
         // Return: "session", "email", "first_name", "last_name"
 
         $email = $this->request->getVar('email');
@@ -113,9 +113,9 @@ class Auth extends BaseController
 
     public function register()
     {
-        // Membuat user baru
+        // Register a new user
         // Method: POST
-        // Payload: "email", "password"
+        // Body (JSON): "email", "password"
 
         $email = $this->request->getVar('email');
         $password = $this->request->getVar('password');
@@ -150,7 +150,7 @@ class Auth extends BaseController
     {
         // Change password
         // Method: POST
-        // Payload: "session", "old_password", "new_password", "confirm_password"
+        // Body (JSON): "email"
 
         $resetPasswordModel = new \App\Models\ResetPasswordToken();
         $resetPasswordModel->expunge_expired_tokens();
@@ -191,7 +191,7 @@ class Auth extends BaseController
     {
         // Confirm change password
         // Method: POST
-        // Payload: "token", "new_password"
+        // Body (JSON): "token", "new_password"
 
 
         $resetPasswordModel = new \App\Models\ResetPasswordToken();
@@ -227,9 +227,10 @@ class Auth extends BaseController
 
     public function logout()
     {
-        // Delete user session
+        // Logout user by deleting session
         // Method: POST
-        // Payload: "session"
+        // Header:
+        //  - Authorization: Bearer <session>
 
         $session = get_bearer_token($this->request->getHeaderLine('Authorization'));
 
