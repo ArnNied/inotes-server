@@ -81,7 +81,7 @@ class Notes extends BaseController
             $note_id = "note-" . generate_string(32);
         }
 
-        $now = time();
+        $now = time() * 1000;
         $note = [
             "user_id" => $user_id,
             "id" => $note_id,
@@ -151,7 +151,7 @@ class Notes extends BaseController
         if (!$note) {
             return $this->respond(["message" => "Note not found"], 404);
         } else {
-            $now = time();
+            $now = time() * 1000;
             $note = [
                 "title" => $title,
                 "body" => $body,

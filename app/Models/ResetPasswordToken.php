@@ -42,6 +42,6 @@ class ResetPasswordToken extends Model
 
     public function expunge_expired_tokens()
     {
-        $this->where('expiry <', time())->delete();
+        $this->where('expiry <', time() * 1000)->delete();
     }
 }

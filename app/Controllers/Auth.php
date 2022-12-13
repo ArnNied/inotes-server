@@ -91,7 +91,7 @@ class Auth extends BaseController
                 $this->sessionModel->insert([
                     'user_id' => $user['id'],
                     'hash' => $sessionHash,
-                    'expiry' => time() + 608400,
+                    'expiry' => time() * 1000 + 608400,
                 ]);
 
                 // Return filtered data of user
@@ -140,7 +140,7 @@ class Auth extends BaseController
         $this->userModel->insert([
             'email' => $email,
             'password' => password_hash($password, PASSWORD_DEFAULT),
-            'registered_at' => time(),
+            'registered_at' => time() * 1000,
         ]);
 
         return $this->respond(["message" => "Registration succesful"], 201);
@@ -177,7 +177,7 @@ class Auth extends BaseController
                 $resetPasswordModel->insert([
                     'user_id' => $user['id'],
                     'token' => $token,
-                    'expiry' => time() + 300, // 5 minutes
+                    'expiry' => time() * 1000 + 300, // 5 minutes
                 ]);
             } else {
                 return $this->respond(["message" => "Failed to send email"], 500);

@@ -42,11 +42,11 @@ class Session extends Model
 
     public function refresh_session($hash, $seconds = 604800)
     {
-        $this->update($hash, ['expiry' => time() + $seconds]);
+        $this->update($hash, ['expiry' => time() * 1000 + $seconds]);
     }
 
     public function expunge_expired_sessions()
     {
-        $this->where('expiry <', time())->delete();
+        $this->where('expiry <', time() * 1000)->delete();
     }
 }
